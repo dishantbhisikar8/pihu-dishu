@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Dishant ❤️ Pookie</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Comic Sans MS", cursive;
+        }
+
+        /* =========================
+   FULLSCREEN BACKGROUND
+========================= */
+        body {
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            text-align: center;
+            background: linear-gradient(180deg, #ffd6e7, #ffeef6);
+            position: relative;
+        }
+
+        /* ❤️ REAL SVG HEART BACKGROUND */
+        .bgHeart {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+
+            width: 700px;
+            opacity: .22;
+            z-index: 0;
+        }
+
+
+
+        /* CONTENT */
+        #app {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+
+            z-index: 2;
+            max-width: 420px;
+            width: 90%;
+
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+
+
+        /* TEXT */
+        .top {
+            font-size: 30px;
+            color: #df2d2d;
+            margin-bottom: 15px;
+            margin-left: 100px;
+        }
+
+        .typing {
+            font-size: 30px;
+            font-weight: bold;
+            color: #e91e63;
+            min-height: 70px;
+            margin-left: 35px;
+        }
+
+        img {
+            width: 260px;
+            /* fixed width */
+            height: 260px;
+            /* fixed height */
+            object-fit: cover;
+            /* full image show (no crop) */
+            margin: 15px 0;
+            border-radius: 20px;
+            margin-left: 100px;
+        }
+
+
+        .day {
+            font-size: 24px;
+            font-weight: bold;
+            color: #d81b60;
+            margin-left: 120px;
+        }
+
+        /* BUTTONS */
+        button {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 25px;
+            background: #e91e63;
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+
+            min-width: 130px;
+            /* same size */
+            flex: 1;
+            /* equal width */
+            margin-left: 100px;
+        }
+
+        .close{
+            margin-right: 80px;
+        }
+
+        /* side-by-side row */
+        .btnRow {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            
+        }
+
+
+
+
+        /* ❤️ FLOATING HEARTS */
+        .heart {
+            position: absolute;
+            bottom: -20px;
+            animation: float 6s linear infinite;
+            opacity: .7;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(0)
+            }
+
+            100% {
+                transform: translateY(-110vh)
+            }
+        }
+
+        /* ❤️ POPUP */
+        .popup {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, .6);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10;
+        }
+
+        .popupBox {
+            background: white;
+            padding: 25px;
+            border-radius: 20px;
+            color: #e91e63;
+            font-size: 22px;
+            margin-left: 110px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- ❤️ REAL HEART SHAPE -->
+    <svg class="bgHeart" viewBox="0 0 512 512">
+        <path fill="#ff9bb3"
+            d="M256 464s-192-112-192-256c0-70 54-128 128-128 44 0 83 23 104 58 21-35 60-58 104-58 74 0 128 58 128 128 0 144-192 256-192 256z" />
+    </svg>
+
+    <div id="app"></div>
+
+    <script>
+
+        /* PERSONALIZE */
+        const yourName = "Dishant";
+        const partnerName = "Pihu";
+
+        const app = document.getElementById("app");
+
+        let step = 0;
+        let timer = null;
+        let popupOpen = false;
+
+
+        /* PAGES */
+        const pages = [
+            { top: ` ${partnerName} 💕`, text: "Ready for 7 days of love?", img: "images/day.jpg", type: "start" },
+            { top: "Don't say no 🥺", text: "Why did you click NO?", img: "images/sad.jpg", type: "retry" },
+
+            { top: "Phool for my fool 🌹", day: "Rose Day", img: "images/rose.jpg" },
+            { top: "Will you be mine forever? 💍", day: "Propose Day", img: "images/propose.jpg" },
+            { top: "I ate ur chocolate btw 🍫", day: "Chocolate Day", img: "images/choco.png" },
+            { top: "I Promise to stay by ur side 🤞", day: "Promise Day", img: "images/promise.jpg" },
+            { top: "virtual hug for you! 🤗", day: "Hug Day", img: "images/hug.jpg" },
+            { top: "you wear my kisses better than me 💋", day: "Kiss Day", img: "images/kiss.jpg" },
+            { top: `Forever ${yourName} ❤️ ${partnerName}`, day: "Valentine's Day", img: "images/valentine.jpg", last: true }
+        ];
+
+
+        /* typing effect */
+        function type(el, text) {
+            el.innerHTML = "";
+            let i = 0;
+            const t = setInterval(() => {
+                el.innerHTML += text[i];
+                if (++i >= text.length) clearInterval(t);
+            }, 30);
+        }
+
+
+        /* render */
+        function render() {
+
+            clearInterval(timer);
+
+            const p = pages[step];
+
+            /* start / retry */
+            if (p.type) {
+                app.innerHTML = `
+      <div class="top">${p.top}</div>
+      <div class="typing" id="t"></div>
+      <img src="${p.img}">
+
+      <div class="btnRow">
+        <button onclick="${p.type === 'start' ? 'startLove()' : 'reset()'}">
+          ${p.type === 'start' ? 'YES ❤️' : 'TRY AGAIN ❤️'}
+        </button>
+
+        ${p.type === 'start'
+                        ? '<button onclick="retry()">NO</button>'
+                        : ''
+                    }
+      </div>
+    `;
+
+                type(document.getElementById("t"), p.text);
+                return;
+            }
+
+
+            /* day slides */
+            app.innerHTML = `
+    <div class="top">${p.top}</div>
+    <img src="${p.img}">
+    <div class="day">Happy ${p.day} ❤️</div>
+  `;
+
+            /* last page popup */
+            if (p.last && !popupOpen) {
+                popupOpen = true;
+                setTimeout(showPopup, 1200);
+            }
+
+            /* auto slide (only if popup closed) */
+            timer = setInterval(() => {
+                if (!popupOpen) {
+                    step++;
+                    if (step >= pages.length) step = 0;
+                    render();
+                }
+            }, 3000);
+        }
+
+
+        /* actions */
+        function startLove() { step = 2; render(); }
+        function retry() { step = 1; render(); }
+        function reset() { step = 0; popupOpen = false; render(); }
+
+
+        /* popup */
+        function showPopup() {
+            clearInterval(timer);
+
+            const pop = document.createElement("div");
+            pop.className = "popup";
+            pop.innerHTML = `
+    <div class="popupBox">
+      ❤️ ${yourName} loves ${partnerName} forever ❤️<br><br> 
+      Kare chaand taaron ko,
+      Mashhoor itna kyu       <br><br>
+      Kambhakht inse bhi       <br><br>
+      Khoobsurat hai tu...      <br><br>
+      I love You ❤️      <br><br>
+      Happy Valentine's Day 💕<br><br>
+      <button class=close onclick="closePopup(this)">Close</button>
+    </div>
+  `;
+            document.body.appendChild(pop);
+        }
+
+        function closePopup(btn) {
+            btn.closest(".popup").remove();
+            popupOpen = false;
+            step = 0;
+            render();
+        }
+
+
+        /* floating hearts */
+        setInterval(() => {
+            const h = document.createElement("div");
+            h.className = "heart";
+            h.innerHTML = "❤️";
+            h.style.left = Math.random() * 100 + "vw";
+            h.style.fontSize = (14 + Math.random() * 18) + "px";
+            document.body.appendChild(h);
+            setTimeout(() => h.remove(), 6000);
+        }, 400);
+
+        render();
+
+    </script>
+</body>
+
+</html>
